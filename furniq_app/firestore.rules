@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin Check Helper
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ── Products: public read, authenticated write ──
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin() || request.auth != null; // For now, allowing any auth user. Ideally, only isAdmin()
+    }
+
+    // ── Categories: public read, authenticated write ──
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin() || request.auth != null;
+    }
+
+    // ── Users: only own user can read/write their data ──
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isAdmin();
+    }
+
+    // ── Cart items: authenticated users can manage their own cart ──
+    match /cartItems/{cartItemId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Addresses: authenticated users can manage their own addresses ──
+    match /addresses/{addressId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow write, delete: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // ── Orders: authenticated users can read/create their own orders ──
+    match /orders/{orderId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow delete: if false; // Orders are permanent records
+      
+      // Admin permissions
+      allow read, write, update: if isAdmin();
+    }
+    
+    // ── Notifications: read and mark as read by user ──
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create: if false; // Only Cloud Functions can create notifications
+      allow delete: if false; // Notifications are kept as history
+      
+      // Admin permissions
+      allow read, write, update: if isAdmin();
+    }
+  }
+}
