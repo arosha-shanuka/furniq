@@ -1,0 +1,66 @@
+# ============================================================
+# SECURITY: Secrets & Keys — NEVER commit these
+# ============================================================
+.env
+.env.*
+**/serviceAccountKey*.json
+**/google-services.json
+**/GoogleService-Info.plist
+
+# ============================================================
+# Flutter / Dart
+# ============================================================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# ============================================================
+# IDE
+# ============================================================
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# ============================================================
+# Debug / Analysis logs (temp files)
+# ============================================================
+*.log
+analyze*.txt
+flutter_01.log
+
+# ============================================================
+# OS & Misc
+# ============================================================
+*.class
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+Thumbs.db
+
+# ============================================================
+# Build artifacts
+# ============================================================
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# ============================================================
+# Symbolication & Obfuscation
+# ============================================================
+app.*.symbols
+app.*.map.json
